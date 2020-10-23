@@ -15,6 +15,7 @@
 #include <stdexcept>
 //#include <stralign.h>
 #include <cstring>
+#include <cstdlib>
 
 using namespace std;
 
@@ -61,7 +62,7 @@ public:
 
 	void	ft_save_model(string file_name, double mean, double std)
 	{
-		ofstream file;
+		ofstream	file;
 
 		file.open(file_name);
 		if (!file)

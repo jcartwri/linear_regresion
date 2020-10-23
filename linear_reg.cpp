@@ -78,6 +78,13 @@ int main(int argc, char **argv)
 	{
 		for (int i = 1; i < argc; i++)
 		{
+			if ((strcmp(argv[i], "--help") == 0) || (strcmp(argv[i], "-h") == 0))
+			{
+				cout << "flags:" << endl;
+                                cout << "--file $name_file_for_predict.csv$ " << endl;
+                                cout << "--x $int or float$" << endl;
+				return (0);
+			}
 			if (strcmp(argv[i], "--file") == 0)
 			{
 				if (i + 2 > argc)
@@ -95,7 +102,6 @@ int main(int argc, char **argv)
 				i++;
 			}
 		}
-		cout << flag_x << " -- " << flag_path << " -- " << file << " -- " << x << endl;
 		if (!flag_x && !flag_path)
 			throw runtime_error("cann't argument");
 		ft_out_put(flag_x, flag_path, file, x);

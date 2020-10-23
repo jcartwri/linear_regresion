@@ -1,19 +1,18 @@
-
 #include "pch.h"
 #include <iostream>
 #include <stdexcept>
 #include <numeric>
 
-vector<vector<int>> read_file(void)
+vector< vector<int> > read_file(string file_name)
 {
 	string line;
 	int mile;
 	int pr;
 	vector<int> mileage;
 	vector<int> price;
-	vector<vector<int>> res;
+	vector<vector<int> > res;
 
-	ifstream file("data.csv");
+	ifstream file(file_name);
 	if (!file)
 		throw runtime_error("...");
 	getline(file, line, '\n');
@@ -31,15 +30,16 @@ vector<vector<int>> read_file(void)
 	return (res);
 }
 
-int ft_work_horse(int flag_v, double lr, int n_iter)
+int ft_work_horse(int flag_v, double lr, int n_iter, string file_name)
 {
 	double	std;
 	double	mean;
-	vector<vector<int>> mas;
+	vector<vector<int> > mas;
 	vector<double> X;
+	string	py_request;
 
 	std = 0.0;
-	mas = read_file();
+	mas = read_file(file_name);
 	vector<int> &mileage = mas.at(0);
 	mean = accumulate(mileage.begin(), mileage.end(), 0) / static_cast<int>(mileage.size());
 	for (auto & d : mileage)
@@ -49,16 +49,16 @@ int ft_work_horse(int flag_v, double lr, int n_iter)
 	for (int i = 0; i < static_cast<int>(mileage.size()); i++)
 		X.push_back(static_cast<double>(((mileage[i]) - mean) / std));
 
-	cout << mean << " ----- " << std << endl << endl;
-	for (int i = 0; i < static_cast<int>(mileage.size()); i++)
-	{
-		cout << X[i] << endl;
-	}
 	Perceptron per(lr, n_iter);
 	per.fit(X, mas[1]);
-	cout << flag_v << " ** ** " << lr << " ** ** " << n_iter << endl;
 	pair<double, double> p = per.ft_get_theta();
 	per.ft_save_model("model.txt", mean, std);
+	if (flag_v)
+	{
+		py_request = "python3 visual.py ";
+		py_request = py_request + file_name;
+		system(py_request.c_str());
+	}
 	return (1);
 }
 
@@ -67,6 +67,7 @@ int	main(int argc, char **argv)
 	int		flag_v;
 	double	lr;
 	int		n_iter;
+	string		file_name;
 	
 	flag_v = 0;
 	lr = 0.15;
@@ -77,8 +78,24 @@ int	main(int argc, char **argv)
 		{
 			for (int i = 1; i < argc; i++)
 			{
+				if ((strcmp(argv[i], "--help") == 0) || (strcmp(argv[i], "-h") == 0))
+				{
+					cout << "flags:" << endl;
+					cout << "--v It is include visualizations on the Python" << endl;
+					cout << "--lr $int or float$ It is lear_rate" << endl;
+					cout << "--iter $int or float$ It is count iter for linear regresion" << endl;
+					cout << "--file $train_file_name.csv$" << endl;
+					return (0);
+				}
 				if (strcmp(argv[i], "--v") == 0)
 					flag_v = 1;
+				else if (strcmp(argv[i], "--file") == 0)
+				{		
+					if (i + 2 > argc)
+                                                throw runtime_error("Error: bed parametr");
+					file_name = argv[i + 1];
+					i++;	
+				}
 				else if (strcmp(argv[i], "--lr") == 0)
 				{
 					if (i + 2 > argc)
@@ -97,7 +114,7 @@ int	main(int argc, char **argv)
 				}
 			}
 		}
-		ft_work_horse(flag_v, lr, n_iter);
+		ft_work_horse(flag_v, lr, n_iter, file_name);
 	}
 	catch (runtime_error& ex)
 	{
